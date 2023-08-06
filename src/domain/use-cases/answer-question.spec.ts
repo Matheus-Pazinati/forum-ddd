@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest'
+import { expect, test } from 'vitest'
 import { AnswerQuestionUseCase } from './answer-question'
 import { AnswersRepository } from '../repositories/answers-repository'
 import { Answer } from '../entities/answer'
@@ -9,7 +9,7 @@ class FakeAnswerRepository implements AnswersRepository {
   }
 }
 
-it("should be able to answer a question", async () => {
+test("it should be able to answer a question", async () => {
   const questionAnswer = new AnswerQuestionUseCase(new FakeAnswerRepository())
 
   const answer = await questionAnswer.execute({
