@@ -14,8 +14,8 @@ test("it should be able to answer a question", async () => {
   const questionAnswer = new AnswerQuestionUseCase(new FakeAnswerRepository())
 
   const answer = await questionAnswer.execute({
-    instructorId: new UniqueEntityID("1"),
-    questionId: new UniqueEntityID("1"),
+    instructorId: "1",
+    questionId: "1",
     content: "Test Answer"
   })
 
