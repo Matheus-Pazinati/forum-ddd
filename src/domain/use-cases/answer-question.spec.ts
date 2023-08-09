@@ -1,8 +1,6 @@
-import { expect, test } from 'vitest'
 import { AnswerQuestionUseCase } from './answer-question'
 import { AnswersRepository } from '../repositories/answers-repository'
 import { Answer } from '../entities/answer'
-import { UniqueEntityID } from '../../core/entities/unique-entity.id'
 
 class FakeAnswerRepository implements AnswersRepository {
   async create(answer: Answer) {
