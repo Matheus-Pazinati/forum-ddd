@@ -34,7 +34,49 @@ describe("Choose the best answer for a question", () => {
       authorId: "author-01"
     })
 
-    expect(inMemoryQuestionsRepository.questions[0].bestAnswerId).toEqual(new UniqueEntityID("answer-01"))
+    expect(inMemoryQuestionsRepository.questions[0].bestAnswerId).toEqual(answer.id)
+  })
+
+  test("it should not be able to other user choose the question best answer", async() => {
+    const question = makeQuestion({
+      authorId: new UniqueEntityID("author-01")
+    }, new UniqueEntityID("question-01"))
+
+    inMemoryQuestionsRepository.create(question)
+
+    const answer = makeAnswer({
+      questionId: new UniqueEntityID("question-01")
+    }, new UniqueEntityID("answer-01"))
+
+    inMemoryAnswersRepository.create(answer)
+
+    expect(async() => {
+      await chooseBestAnswer.execute({
+        answerId: "answer-01",
+        authorId: "author-02"
+      })
+    }).rejects.toBeInstanceOf(Error)
+  })
+
+  test("it should not be able to choose a nonexistent answer to be the question best answer", async() => {
+    const question = makeQuestion({
+      authorId: new UniqueEntityID("author-01")
+    }, new UniqueEntityID("question-01"))
+
+    inMemoryQuestionsRepository.create(question)
+
+    const answer = makeAnswer({
+      questionId: new UniqueEntityID("question-01")
+    }, new UniqueEntityID("answer-01"))
+
+    inMemoryAnswersRepository.create(answer)
+
+    expect(async() => {
+      await chooseBestAnswer.execute({
+        answerId: "answer-02",
+        authorId: "author-01"
+      })
+    }).rejects.toBeInstanceOf(Error)
   })
 
 })
