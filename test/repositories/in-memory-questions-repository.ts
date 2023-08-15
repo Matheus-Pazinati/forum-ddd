@@ -39,7 +39,7 @@ export class InMemoryQuestionsRepository implements QuestionsRepository {
       return a.createdAt.getTime() - b.createdAt.getTime()
     })
     .reverse()
-    .slice((page - 1) * 20, page * MAX_QUESTIONS_BY_PAGE)
+    .slice((page - 1) * MAX_QUESTIONS_BY_PAGE, page * MAX_QUESTIONS_BY_PAGE)
 
     return questions
   }
