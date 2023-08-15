@@ -1,5 +1,5 @@
-import { Answer } from "../../enterprise/entities/answer";
-import { AnswersRepository } from "../repositories/answers-repository";
+import { Answer } from '../../enterprise/entities/answer'
+import { AnswersRepository } from '../repositories/answers-repository'
 
 interface EditAnswerUseCaseRequest {
   answerId: string
@@ -17,16 +17,16 @@ export class EditAnswerUseCase {
   async execute({
     answerId,
     authorId,
-    content
+    content,
   }: EditAnswerUseCaseRequest): Promise<EditAnswerUseCaseResponse> {
     const answer = await this.answersRepository.findById(answerId)
 
     if (!answer) {
-      throw new Error("Answer not found.")
+      throw new Error('Answer not found.')
     }
 
     if (answer.authorId.toString() !== authorId) {
-      throw new Error("Not allowed.")
+      throw new Error('Not allowed.')
     }
 
     answer.content = content
@@ -34,7 +34,7 @@ export class EditAnswerUseCase {
     await this.answersRepository.save(answer)
 
     return {
-      answer
+      answer,
     }
   }
 }

@@ -1,10 +1,10 @@
-import { Question } from "../../enterprise/entities/question";
-import { QuestionsRepository } from "../repositories/questions-repository";
+import { Question } from '../../enterprise/entities/question'
+import { QuestionsRepository } from '../repositories/questions-repository'
 
 interface EditQuestionUseCaseRequest {
-  authorId: string,
-  questionId: string,
-  title: string,
+  authorId: string
+  questionId: string
+  title: string
   content: string
 }
 
@@ -19,16 +19,16 @@ export class EditQuestionUseCase {
     authorId,
     questionId,
     content,
-    title
+    title,
   }: EditQuestionUseCaseRequest): Promise<EditQuestionUseCaseResponse> {
     const question = await this.questionsRepository.findById(questionId)
 
     if (!question) {
-      throw new Error("Question not found.")
+      throw new Error('Question not found.')
     }
 
     if (question.authorId.toString() !== authorId) {
-      throw new Error("Not allowed.")
+      throw new Error('Not allowed.')
     }
 
     question.title = title
@@ -37,7 +37,7 @@ export class EditQuestionUseCase {
     await this.questionsRepository.save(question)
 
     return {
-      question
+      question,
     }
   }
 }

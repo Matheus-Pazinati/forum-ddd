@@ -1,5 +1,5 @@
-import { Question } from "../../enterprise/entities/question";
-import { QuestionsRepository } from "../repositories/questions-repository";
+import { Question } from '../../enterprise/entities/question'
+import { QuestionsRepository } from '../repositories/questions-repository'
 
 interface FetchRecentQuestionsRequest {
   page: number
@@ -13,12 +13,12 @@ export class FetchRecentQuestions {
   constructor(private questionsRepository: QuestionsRepository) {}
 
   async execute({
-    page
+    page,
   }: FetchRecentQuestionsRequest): Promise<FetchRecentQuestionsResponse> {
     const questions = await this.questionsRepository.findManyRecent({ page })
 
     return {
-      questions
+      questions,
     }
   }
 }
