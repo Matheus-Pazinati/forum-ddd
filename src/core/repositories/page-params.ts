@@ -1,3 +1,3 @@
-export interface PageParams {
+export interface PaginationParams {
   page: number
 }

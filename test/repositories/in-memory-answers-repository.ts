@@ -1,4 +1,4 @@
-import { PageParams } from "@/core/repositories/page-params";
+import { PaginationParams } from "@/core/repositories/page-params";
 import { AnswersRepository } from "@/domain/forum/application/repositories/answers-repository";
 import { Answer } from "@/domain/forum/enterprise/entities/answer";
 
@@ -17,7 +17,7 @@ export class InMemoryAnswersRepository implements AnswersRepository {
     return answer
   }
 
-  async findManyByQuestionId(questionId: string, { page }: PageParams) {
+  async findManyByQuestionId(questionId: string, { page }: PaginationParams) {
     const MAX_ANSWERS_BY_PAGE = 20
     const answers = this.answers.filter((answer) => {
       return answer.questionId.toString() === questionId
