@@ -4,6 +4,8 @@ import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer'
 import { makeQuestion } from 'test/factories/make-question'
 import { UniqueEntityID } from '@/core/entities/unique-entity.id'
 import { makeAnswer } from 'test/factories/make-answer'
+import { NotAllowedError } from './errors/not-allowed-error'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 describe('Choose the best answer for a question', () => {
   let inMemoryQuestionsRepository: InMemoryQuestionsRepository
@@ -38,14 +40,16 @@ describe('Choose the best answer for a question', () => {
 
     inMemoryAnswersRepository.create(answer)
 
-    await chooseBestAnswer.execute({
+    const result = await chooseBestAnswer.execute({
       answerId: 'answer-01',
       authorId: 'author-01',
     })
 
-    expect(inMemoryQuestionsRepository.questions[0].bestAnswerId).toEqual(
-      answer.id,
-    )
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(inMemoryQuestionsRepository.questions[0].bestAnswerId).toEqual(answer.id)
+    }
+    
   })
 
   test('it should not be able to other user choose the question best answer', async () => {
@@ -67,12 +71,13 @@ describe('Choose the best answer for a question', () => {
 
     inMemoryAnswersRepository.create(answer)
 
-    expect(async () => {
-      await chooseBestAnswer.execute({
-        answerId: 'answer-01',
-        authorId: 'author-02',
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await chooseBestAnswer.execute({
+      answerId: 'answer-01',
+      authorId: 'author-02',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 
   test('it should not be able to choose a nonexistent answer to be the question best answer', async () => {
@@ -94,11 +99,12 @@ describe('Choose the best answer for a question', () => {
 
     inMemoryAnswersRepository.create(answer)
 
-    expect(async () => {
-      await chooseBestAnswer.execute({
-        answerId: 'answer-02',
-        authorId: 'author-01',
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await chooseBestAnswer.execute({
+      answerId: 'answer-02',
+      authorId: 'author-01',
+    }) 
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 })

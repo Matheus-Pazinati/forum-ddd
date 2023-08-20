@@ -4,6 +4,7 @@ import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questio
 import { makeAnswer } from 'test/factories/make-answer'
 import { UniqueEntityID } from '@/core/entities/unique-entity.id'
 import { makeQuestion } from 'test/factories/make-question'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 describe('Fetch Question Answers', () => {
   let inMemoryAnswersRepository: InMemoryAnswersRepository
@@ -40,21 +41,25 @@ describe('Fetch Question Answers', () => {
       }),
     )
 
-    const { answers } = await fetchAnswers.execute({
+    const result = await fetchAnswers.execute({
       page: 1,
       questionId: 'question-01',
     })
 
-    expect(answers).toHaveLength(2)
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.answers).toHaveLength(2)
+    }
   })
 
   test('it should not be able to fetch answers from a nonexistent question', async () => {
-    expect(async () => {
-      await fetchAnswers.execute({
-        page: 1,
-        questionId: 'question-01',
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await fetchAnswers.execute({
+      page: 1,
+      questionId: 'question-01',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
   test('it should be able to return a paginated answers from a question', async () => {
@@ -69,11 +74,15 @@ describe('Fetch Question Answers', () => {
       )
     }
 
-    const { answers } = await fetchAnswers.execute({
+    const result = await fetchAnswers.execute({
       page: 2,
       questionId: 'question-01',
     })
 
-    expect(answers).toHaveLength(2)
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(result.value.answers).toHaveLength(2)
+    }
+
   })
 })

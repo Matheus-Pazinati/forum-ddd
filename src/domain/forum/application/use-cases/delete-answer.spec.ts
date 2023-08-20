@@ -2,6 +2,8 @@ import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-r
 import { DeleteAnswerUseCase } from './delete-answer'
 import { makeAnswer } from 'test/factories/make-answer'
 import { UniqueEntityID } from '@/core/entities/unique-entity.id'
+import { NotAllowedError } from './errors/not-allowed-error'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 describe('Delete a Answer', () => {
   let inMemoryAnswersRepository: InMemoryAnswersRepository
@@ -22,11 +24,11 @@ describe('Delete a Answer', () => {
 
     inMemoryAnswersRepository.create(answer)
 
-    await deleteAnswer.execute({
+    const result = await deleteAnswer.execute({
       answerId: 'answer-01',
       authorId: 'author-01',
     })
-
+    expect(result.isRight()).toBe(true)
     expect(inMemoryAnswersRepository.answers).toHaveLength(0)
   })
 
@@ -40,12 +42,13 @@ describe('Delete a Answer', () => {
 
     inMemoryAnswersRepository.create(answer)
 
-    expect(async () => {
-      await deleteAnswer.execute({
-        answerId: 'answer-01',
-        authorId: 'author-02',
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await deleteAnswer.execute({
+      answerId: 'answer-01',
+      authorId: 'author-02',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 
   test('it should not be able to delete a nonexistent answer', async () => {
@@ -58,11 +61,12 @@ describe('Delete a Answer', () => {
 
     inMemoryAnswersRepository.create(answer)
 
-    expect(async () => {
-      await deleteAnswer.execute({
-        answerId: 'answer-02',
-        authorId: 'author-01',
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await deleteAnswer.execute({
+      answerId: 'answer-02',
+      authorId: 'author-01',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 })

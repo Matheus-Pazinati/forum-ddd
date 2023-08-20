@@ -2,6 +2,8 @@ import { UniqueEntityID } from '@/core/entities/unique-entity.id'
 import { Answer } from '../../enterprise/entities/answer'
 import { AnswersRepository } from '@/domain/forum/application/repositories/answers-repository'
 import { QuestionsRepository } from '../repositories/questions-repository'
+import { Either, left, right } from '@/core/either'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface AnswerQuestionUseCaseRequest {
   questionId: string
@@ -9,9 +11,9 @@ interface AnswerQuestionUseCaseRequest {
   content: string
 }
 
-interface AnswerQuestionUseCaseResponse {
+type AnswerQuestionUseCaseResponse = Either<ResourceNotFoundError, {
   answer: Answer
-}
+}>
 
 export class AnswerQuestionUseCase {
   constructor(
@@ -28,7 +30,7 @@ export class AnswerQuestionUseCase {
     const question = await this.questionsRepository.findById(questionId)
 
     if (!question) {
-      throw new Error("Question not found.")
+      return left(new ResourceNotFoundError())
     }
     
     const answer = Answer.create({
@@ -39,8 +41,8 @@ export class AnswerQuestionUseCase {
 
     await this.answersRepository.create(answer)
 
-    return {
-      answer,
-    }
+    return right({
+      answer
+    })
   }
 }

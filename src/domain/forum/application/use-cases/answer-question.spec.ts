@@ -2,6 +2,7 @@ import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questio
 import { AnswerQuestionUseCase } from './answer-question'
 import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository'
 import { makeQuestion } from 'test/factories/make-question'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
@@ -21,23 +22,27 @@ describe('Create Answer for a question', () => {
     const question = makeQuestion()
     await inMemoryQuestionsRepository.create(question)
 
-    const { answer } = await createAnswer.execute({
+    const result = await createAnswer.execute({
       instructorId: 'instructor-01',
       questionId: question.id.toString(),
       content: 'Test Answer',
     })
 
-    expect(answer.content).toEqual('Test Answer')
-    expect(inMemoryAnswersRepository.answers.length).toBe(1)
+    expect(result.isRight()).toBe(true)
+    if (result.isRight()) {
+      expect(inMemoryAnswersRepository.answers[0]).toEqual(result.value.answer)
+    }
+    
   })
 
   test("it should not be able to create a answer for a nonexistent question", async() => {
-    expect(async() => {
-      await createAnswer.execute({
-        instructorId: 'instructor-01',
-        questionId: 'question-01',
-        content: 'Test Answer',
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await createAnswer.execute({
+      instructorId: 'instructor-01',
+      questionId: 'question-01',
+      content: 'Test Answer',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 })

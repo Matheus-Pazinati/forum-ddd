@@ -1,6 +1,8 @@
 import { InMemoryQuestionCommentsRepository } from "test/repositories/in-memory-question-comments-repository"
 import { DeleteQuestionCommentUseCase } from "./delete-question-comment"
 import { makeQuestionComment } from "test/factories/make-question-comment"
+import { ResourceNotFoundError } from "./errors/resource-not-found-error"
+import { NotAllowedError } from "./errors/not-allowed-error"
 
 describe("Delete Question Comment", () => {
   let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentsRepository
@@ -16,11 +18,12 @@ describe("Delete Question Comment", () => {
 
     inMemoryQuestionCommentsRepository.create(questionComment)
 
-    await deleteQuestionComment.execute({
+    const result = await deleteQuestionComment.execute({
       authorId: questionComment.authorId.toString(),
       questionCommentId: questionComment.id.toString()
     })
 
+    expect(result.isRight()).toBe(true)
     expect(inMemoryQuestionCommentsRepository.comments).toHaveLength(0)
   })
 
@@ -29,12 +32,13 @@ describe("Delete Question Comment", () => {
 
     inMemoryQuestionCommentsRepository.create(questionComment)
 
-    expect(async() => {
-      await deleteQuestionComment.execute({
-        authorId: questionComment.authorId.toString(),
-        questionCommentId: "Nonexistent id"
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await deleteQuestionComment.execute({
+      authorId: questionComment.authorId.toString(),
+      questionCommentId: "Nonexistent id"
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
   test("it should not be able to delete a question comment made by other author", async() => {
@@ -42,11 +46,12 @@ describe("Delete Question Comment", () => {
 
     inMemoryQuestionCommentsRepository.create(questionComment)
 
-    expect(async() => {
-      await deleteQuestionComment.execute({
-        authorId: "Other user",
-        questionCommentId: questionComment.id.toString()
-      })
-    }).rejects.toBeInstanceOf(Error)
+    const result = await deleteQuestionComment.execute({
+      authorId: "Other user",
+      questionCommentId: questionComment.id.toString()
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 })
