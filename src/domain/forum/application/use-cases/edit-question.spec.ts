@@ -4,14 +4,18 @@ import { makeQuestion } from 'test/factories/make-question'
 import { UniqueEntityID } from '@/core/entities/unique-entity.id'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
+import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository'
+import { makeQuestionAttachments } from 'test/factories/make-question-attachments'
 
 describe('Edit Question Title or Content', () => {
   let inMemoryQuestionsRepository: InMemoryQuestionsRepository
+  let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
   let editQuestion: EditQuestionUseCase
 
   beforeEach(() => {
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository()
-    editQuestion = new EditQuestionUseCase(inMemoryQuestionsRepository)
+    inMemoryQuestionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository()
+    editQuestion = new EditQuestionUseCase(inMemoryQuestionsRepository, inMemoryQuestionAttachmentsRepository)
   })
 
   test('it should be able to edit a question', async() => {
@@ -26,17 +30,34 @@ describe('Edit Question Title or Content', () => {
 
     inMemoryQuestionsRepository.create(question)
 
+    inMemoryQuestionAttachmentsRepository.questionAttachments.push(
+      makeQuestionAttachments({
+        attachmentId: new UniqueEntityID('attachment-01'),
+        questionId: new UniqueEntityID('question-01')
+      }),
+      makeQuestionAttachments({
+        attachmentId: new UniqueEntityID('attachment-02'),
+        questionId: new UniqueEntityID('question-01')
+      })
+    )
+
     const result = await editQuestion.execute({
       authorId: 'author-01',
       questionId: 'question-01',
       content: 'New content',
       title: 'New title',
+      attachmentsIds: ['attachment-01', 'attachment-03']
     })
 
     expect(result.isRight()).toBe(true)
     if (result.isRight()) {
       expect(inMemoryQuestionsRepository.questions[0]).toEqual(result.value.question)
     }
+    expect(inMemoryQuestionsRepository.questions[0].attachments.currentItems).toHaveLength(2)
+    expect(inMemoryQuestionsRepository.questions[0].attachments.currentItems).toEqual([
+      expect.objectContaining({ attachmentId: new UniqueEntityID("attachment-01") }),
+      expect.objectContaining({ attachmentId: new UniqueEntityID("attachment-03") }),
+    ])
   })
 
   test('it should not be able to edit a nonexistent question', async() => {
@@ -62,7 +83,7 @@ describe('Edit Question Title or Content', () => {
     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
-  test('it should not be able to edit a nonexistent question', async() => {
+  test('it should not be able to edit a question from other user', async() => {
     const question = makeQuestion(
       {
         title: 'Old title',

@@ -3,7 +3,7 @@ import { Question } from '../../enterprise/entities/question'
 import { QuestionsRepository } from '../repositories/questions-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
-import { QuestionAttachmentRepository } from '../repositories/question-attachments-repository'
+import { QuestionAttachmentsRepository } from '../repositories/question-attachments-repository'
 import { QuestionAttachmentList } from '../../enterprise/entities/question-attachment-list'
 import { QuestionAttachment } from '../../enterprise/entities/question-attachment'
 import { UniqueEntityID } from '@/core/entities/unique-entity.id'
@@ -23,7 +23,7 @@ type EditQuestionUseCaseResponse = Either<ResourceNotFoundError | NotAllowedErro
 export class EditQuestionUseCase {
   constructor(
     private questionsRepository: QuestionsRepository,
-    private questionAttachmentsRepository: QuestionAttachmentRepository
+    private questionAttachmentsRepository: QuestionAttachmentsRepository
     ) {}
 
   async execute({
@@ -56,6 +56,7 @@ export class EditQuestionUseCase {
       })
 
       questionAttachmentsList.update(attachments)
+      question.attachments = questionAttachmentsList
     }
 
     question.title = title
