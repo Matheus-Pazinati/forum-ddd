@@ -3,12 +3,17 @@ import { Question } from '../../enterprise/entities/question'
 import { QuestionsRepository } from '../repositories/questions-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
+import { QuestionAttachmentRepository } from '../repositories/question-attachments-repository'
+import { QuestionAttachmentList } from '../../enterprise/entities/question-attachment-list'
+import { QuestionAttachment } from '../../enterprise/entities/question-attachment'
+import { UniqueEntityID } from '@/core/entities/unique-entity.id'
 
 interface EditQuestionUseCaseRequest {
   authorId: string
   questionId: string
   title: string
   content: string
+  attachmentsIds?: string[]
 }
 
 type EditQuestionUseCaseResponse = Either<ResourceNotFoundError | NotAllowedError, {
@@ -16,13 +21,17 @@ type EditQuestionUseCaseResponse = Either<ResourceNotFoundError | NotAllowedErro
 }>
 
 export class EditQuestionUseCase {
-  constructor(private questionsRepository: QuestionsRepository) {}
+  constructor(
+    private questionsRepository: QuestionsRepository,
+    private questionAttachmentsRepository: QuestionAttachmentRepository
+    ) {}
 
   async execute({
     authorId,
     questionId,
     content,
     title,
+    attachmentsIds
   }: EditQuestionUseCaseRequest): Promise<EditQuestionUseCaseResponse> {
     const question = await this.questionsRepository.findById(questionId)
 
@@ -32,6 +41,21 @@ export class EditQuestionUseCase {
 
     if (question.authorId.toString() !== authorId) {
       return left(new NotAllowedError())
+    }
+
+    const currentQuestionAttachments = await this.questionAttachmentsRepository.findManyByQuestionId(questionId)
+
+    const questionAttachmentsList = new QuestionAttachmentList(currentQuestionAttachments)
+
+    if (attachmentsIds) {
+      const attachments = attachmentsIds.map((attachmentId) => {
+        return QuestionAttachment.create({
+          attachmentId: new UniqueEntityID(attachmentId),
+          questionId: new UniqueEntityID(questionId)
+        })
+      })
+
+      questionAttachmentsList.update(attachments)
     }
 
     question.title = title
