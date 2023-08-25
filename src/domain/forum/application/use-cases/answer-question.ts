@@ -4,11 +4,14 @@ import { AnswersRepository } from '@/domain/forum/application/repositories/answe
 import { QuestionsRepository } from '../repositories/questions-repository'
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { AnswerAttachment } from '../../enterprise/entities/answer-attachment'
+import { AnswerAttachmentsList } from '../../enterprise/entities/answer-attachments-list'
 
 interface AnswerQuestionUseCaseRequest {
   questionId: string
   instructorId: string
   content: string
+  attachmentsIds?: string[]
 }
 
 type AnswerQuestionUseCaseResponse = Either<ResourceNotFoundError, {
@@ -25,6 +28,7 @@ export class AnswerQuestionUseCase {
     content,
     instructorId,
     questionId,
+    attachmentsIds
   }: AnswerQuestionUseCaseRequest): Promise<AnswerQuestionUseCaseResponse> {
 
     const question = await this.questionsRepository.findById(questionId)
@@ -38,6 +42,17 @@ export class AnswerQuestionUseCase {
       questionId: new UniqueEntityID(questionId),
       content,
     })
+
+    if (attachmentsIds) {
+      const answerAttachmentsList = attachmentsIds.map((attachmentId) => {
+        return AnswerAttachment.create({
+          answerId: answer.id,
+          attachmentId: new UniqueEntityID(attachmentId)
+        })
+      })
+
+      answer.attachments = new AnswerAttachmentsList(answerAttachmentsList)
+    }
 
     await this.answersRepository.create(answer)
 
