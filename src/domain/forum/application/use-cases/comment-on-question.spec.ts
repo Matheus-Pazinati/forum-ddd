@@ -3,7 +3,7 @@ import { InMemoryQuestionCommentsRepository } from "test/repositories/in-memory-
 import { CommentOnQuestionUseCase } from "./comment-on-question"
 import { makeQuestion } from "test/factories/make-question"
 import { UniqueEntityID } from "@/core/entities/unique-entity.id"
-import { ResourceNotFoundError } from "./errors/resource-not-found-error"
+import { ResourceNotFoundError } from "@/core/errors/use-case-errors/resource-not-found-error"
 import { InMemoryAnswerAttachmentsRepository } from "test/repositories/in-memory-answer-attachments-repository"
 import { InMemoryQuestionAttachmentsRepository } from "test/repositories/in-memory-question-attachments-repository"
 

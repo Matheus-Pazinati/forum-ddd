@@ -2,8 +2,8 @@ import { describe } from "node:test";
 import { InMemoryAnswerCommentsRepository } from "test/repositories/in-memory-answer-comments-repository";
 import { DeleteAnswerCommentUseCase } from "./delete-answer-comment";
 import { makeAnswerComment } from "test/factories/make-answer-comment";
-import { ResourceNotFoundError } from "./errors/resource-not-found-error";
-import { NotAllowedError } from "./errors/not-allowed-error";
+import { ResourceNotFoundError } from "@/core/errors/use-case-errors/resource-not-found-error";
+import { NotAllowedError } from "@/core/errors/use-case-errors/not-allowed-error";
 
 describe("Delete a Answer Comment", () => {
   let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository
