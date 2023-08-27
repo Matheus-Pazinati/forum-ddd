@@ -5,15 +5,21 @@ import { makeAnswer } from 'test/factories/make-answer'
 import { UniqueEntityID } from '@/core/entities/unique-entity.id'
 import { makeQuestion } from 'test/factories/make-question'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository'
+import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository'
 
 describe('Fetch Question Answers', () => {
   let inMemoryAnswersRepository: InMemoryAnswersRepository
   let inMemoryQuestionsRepository: InMemoryQuestionsRepository
   let fetchAnswers: FetchQuestionAnswers
+  let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository
+  let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
 
   beforeEach(() => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository()
-    inMemoryQuestionsRepository = new InMemoryQuestionsRepository()
+    let inMemoryAnswerAttachmentsRepository = new InMemoryAnswerAttachmentsRepository()
+    let inMemoryQuestionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository()
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(inMemoryAnswerAttachmentsRepository)
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(inMemoryQuestionAttachmentsRepository)
     fetchAnswers = new FetchQuestionAnswers(
       inMemoryAnswersRepository,
       inMemoryQuestionsRepository,

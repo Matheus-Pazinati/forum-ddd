@@ -4,14 +4,17 @@ import { CommentOnAnswerUseCase } from "./comment-on-answer"
 import { makeAnswer } from "test/factories/make-answer"
 import { UniqueEntityID } from "@/core/entities/unique-entity.id"
 import { ResourceNotFoundError } from "./errors/resource-not-found-error"
+import { InMemoryAnswerAttachmentsRepository } from "test/repositories/in-memory-answer-attachments-repository"
 
 describe("Comment on Answer", () => {
   let inMemoryAnswersRepository: InMemoryAnswersRepository
   let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository
   let commentOnAnswer: CommentOnAnswerUseCase
+  let inMemoryAnswerAttachmentsRepository = new InMemoryAnswerAttachmentsRepository()
 
   beforeEach(() => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository()
+    inMemoryAnswerAttachmentsRepository = new InMemoryAnswerAttachmentsRepository()
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(inMemoryAnswerAttachmentsRepository)
     inMemoryAnswerCommentsRepository = new InMemoryAnswerCommentsRepository()
     commentOnAnswer = new CommentOnAnswerUseCase(
       inMemoryAnswersRepository,
