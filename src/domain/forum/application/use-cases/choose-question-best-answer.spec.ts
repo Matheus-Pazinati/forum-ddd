@@ -2,7 +2,7 @@ import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-r
 import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questions-repository'
 import { ChooseQuestionBestAnswerUseCase } from './choose-question-best-answer'
 import { makeQuestion } from 'test/factories/make-question'
-import { UniqueEntityID } from '@/core/entities/unique-entity.id'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { makeAnswer } from 'test/factories/make-answer'
 import { NotAllowedError } from '@/core/errors/use-case-errors/not-allowed-error'
 import { ResourceNotFoundError } from '@/core/errors/use-case-errors/resource-not-found-error'

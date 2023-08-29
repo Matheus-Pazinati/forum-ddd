@@ -1,4 +1,4 @@
-import { UniqueEntityID } from "@/core/entities/unique-entity.id";
+import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { AnswerAttachment } from "@/domain/forum/enterprise/entities/answer-attachment";
 
 export function makeAnswerAttachments(override: Partial<AnswerAttachment>, id?: UniqueEntityID) {

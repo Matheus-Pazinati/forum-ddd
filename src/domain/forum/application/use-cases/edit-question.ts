@@ -6,7 +6,7 @@ import { NotAllowedError } from '@/core/errors/use-case-errors/not-allowed-error
 import { QuestionAttachmentsRepository } from '../repositories/question-attachments-repository'
 import { QuestionAttachmentList } from '../../enterprise/entities/question-attachment-list'
 import { QuestionAttachment } from '../../enterprise/entities/question-attachment'
-import { UniqueEntityID } from '@/core/entities/unique-entity.id'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 interface EditQuestionUseCaseRequest {
   authorId: string
