@@ -26,9 +26,8 @@ export class OnAnswerCreated implements EventHandler {
       await this.createNotification.execute({
         receiverId: question.authorId.toString(),
         title: `Nova resposta para "${question.title.substring(0, 40).concat('...')}"`,
-        content: question.excerption
+        content: answer.excerption
       })
     }
   }
-  
 }
